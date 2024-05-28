@@ -3,12 +3,96 @@
  */
 package nl.svsticky.crazy88;
 
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.exceptions.InvalidTokenException;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import nl.svsticky.crazy88.command.CommandHandler;
+import nl.svsticky.crazy88.command.CommandManager;
+import nl.svsticky.crazy88.config.ConfigHandler;
+import nl.svsticky.crazy88.config.InvalidConfigurationException;
+import nl.svsticky.crazy88.config.model.ConfigModel;
+import nl.svsticky.crazy88.events.SlashCommandListener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
+
+    protected static final Logger logger = LogManager.getLogger();
+
+    public static Logger getLogger() {
+        return logger;
     }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        logger.info("Starting SVSticky Crazy88 Bot");
+
+        ConfigModel config = openConfig();
+        openJda(config.discord.token);
+    }
+
+    private static void openJda(String token)  {
+        CommandManager commandManager = new CommandManager();
+        try {
+            JDA jda = JDABuilder.createLight(token)
+                    .addEventListeners(new SlashCommandListener())
+                    .setEnabledIntents(
+                            GatewayIntent.DIRECT_MESSAGES
+                    )
+                    .build()
+                    .awaitReady();
+
+            jda.updateCommands().addCommands(
+                    // Iterate over all handlers
+                    Arrays.stream(commandManager.getHandlers())
+                            // Retrieve command data
+                            .map(CommandHandler::getCommandData)
+                            // Convert data to slash command
+                            .map(data -> Commands.slash(data.commandName().command, data.description())
+                                    // Add options
+                                    .addOptions(Arrays.stream(data.options())
+                                            .map(option -> new OptionData(option.type(), option.name(), option.description(), true))
+                                            .toList()
+                                    )
+                            )
+                            .toList()
+            ).queue();
+
+        } catch (InvalidTokenException e) {
+            logger.error("Invalid discord token provided: ", e);
+            System.exit(1);
+        } catch (InterruptedException e) {
+            logger.error("Interrupted while waiting for Discord connection to be ready: ", e);
+            System.exit(1);
+        }
+    }
+
+    private static ConfigModel openConfig() {
+        String configPathStr = System.getenv("CONFIG_PATH");
+        if(configPathStr == null) {
+            logger.error("The environmental variable CONFIG_PATH is not set");
+            System.exit(1);
+            return null;
+        }
+
+        logger.debug("Opening configuration file");
+
+        try {
+            Path configPath = Paths.get(configPathStr);
+            Path absolute = configPath.toAbsolutePath();
+            return ConfigHandler.open(absolute);
+        } catch (IOException | InvalidConfigurationException | InvalidPathException e) {
+            logger.error("Failed to open configuration file", e);
+            System.exit(1);
+            return null;
+        }
     }
 }
