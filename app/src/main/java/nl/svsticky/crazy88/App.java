@@ -14,6 +14,8 @@ import nl.svsticky.crazy88.command.CommandManager;
 import nl.svsticky.crazy88.config.ConfigHandler;
 import nl.svsticky.crazy88.config.InvalidConfigurationException;
 import nl.svsticky.crazy88.config.model.ConfigModel;
+import nl.svsticky.crazy88.config.model.DatabaseModel;
+import nl.svsticky.crazy88.database.driver.Driver;
 import nl.svsticky.crazy88.events.SlashCommandListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.Arrays;
 
 public class App {
@@ -36,14 +39,33 @@ public class App {
         logger.info("Starting SVSticky Crazy88 Bot");
 
         ConfigModel config = openConfig();
-        openJda(config.discord.token);
+
+        Driver database = openDatabase(config.database);
+        openJda(config, database);
     }
 
-    private static void openJda(String token)  {
-        CommandManager commandManager = new CommandManager();
+    private static Driver openDatabase(DatabaseModel databaseModel) {
         try {
-            JDA jda = JDABuilder.createLight(token)
-                    .addEventListeners(new SlashCommandListener())
+            Driver database = new Driver(databaseModel);
+            database.applyMigrations();
+
+            return database;
+        } catch(IOException e) {
+            logger.error("Failed to setup database (IO): ", e);
+            System.exit(1);
+            return null;
+        } catch (SQLException e) {
+            logger.error("Failed to setup database (SQL): ", e);
+            System.exit(1);
+            return null;
+        }
+    }
+
+    private static void openJda(ConfigModel config, Driver driver)  {
+        CommandManager commandManager = new CommandManager(driver, config);
+        try {
+            JDA jda = JDABuilder.createLight(config.discord.token)
+                    .addEventListeners(new SlashCommandListener(commandManager))
                     .setEnabledIntents(
                             GatewayIntent.DIRECT_MESSAGES
                     )

@@ -11,4 +11,6 @@ public class ConfigModel {
     public LocationModel[] locations;
     @Required
     public DiscordModel discord;
+    @Required
+    public DatabaseModel database;
 }
