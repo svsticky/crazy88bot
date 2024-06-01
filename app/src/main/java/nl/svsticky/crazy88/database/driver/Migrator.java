@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Migrator {
-    private List<Migration> migrations;
+    private final List<Migration> migrations;
     private final Driver driver;
 
     private static final String MIGRATION_TABLE = "__crazy88_migrations";

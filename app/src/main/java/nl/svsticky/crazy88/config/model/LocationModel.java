@@ -4,5 +4,9 @@ import dev.array21.classvalidator.annotations.Required;
 
 public class LocationModel {
     @Required
+    public String geoLong;
+    @Required
+    public String geoLat;
+    @Required
     public String[] assignments;
 }

@@ -1,7 +1,6 @@
 package nl.svsticky.crazy88.command.handler;
 
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import nl.svsticky.crazy88.command.CommandData;
 import nl.svsticky.crazy88.command.CommandHandler;

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import nl.svsticky.crazy88.command.CommandHandler;
 import nl.svsticky.crazy88.command.CommandManager;
 import nl.svsticky.crazy88.config.ConfigHandler;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 public class App {
 
     protected static final Logger logger = LogManager.getLogger();
+    private static JDA jdaInstance;
 
     public static Logger getLogger() {
         return logger;
@@ -64,15 +66,16 @@ public class App {
     private static void openJda(ConfigModel config, Driver driver)  {
         CommandManager commandManager = new CommandManager(driver, config);
         try {
-            JDA jda = JDABuilder.createLight(config.discord.token)
+            jdaInstance = JDABuilder.createLight(config.discord.token)
                     .addEventListeners(new SlashCommandListener(commandManager))
                     .setEnabledIntents(
                             GatewayIntent.DIRECT_MESSAGES
                     )
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .build()
                     .awaitReady();
 
-            jda.updateCommands().addCommands(
+            jdaInstance.updateCommands().addCommands(
                     // Iterate over all handlers
                     Arrays.stream(commandManager.getHandlers())
                             // Retrieve command data
@@ -95,6 +98,10 @@ public class App {
             logger.error("Interrupted while waiting for Discord connection to be ready: ", e);
             System.exit(1);
         }
+    }
+
+    public static JDA getJdaInstance() {
+        return jdaInstance;
     }
 
     private static ConfigModel openConfig() {

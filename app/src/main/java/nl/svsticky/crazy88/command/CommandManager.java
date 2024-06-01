@@ -19,10 +19,10 @@ public class CommandManager {
                 new EndGameCommand(driver, config),
                 new HelperCommand(),
                 new IamAdminCommand(driver, config),
-                new IamHelperCommand(),
-                new RegisterCommand(),
+                new IamHelperCommand(driver, config),
+                new RegisterCommand(driver, config),
                 new SubmitCommand(),
-                new UnlockCommand(),
+                new UnlockCommand(driver, config),
         };
     }
 

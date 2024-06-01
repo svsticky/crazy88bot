@@ -6,6 +6,7 @@ import nl.svsticky.crazy88.command.CommandData;
 import nl.svsticky.crazy88.command.CommandHandler;
 import nl.svsticky.crazy88.command.CommandName;
 import nl.svsticky.crazy88.command.CommandOption;
+import nl.svsticky.crazy88.command.Replies;
 import nl.svsticky.crazy88.config.model.ConfigModel;
 import nl.svsticky.crazy88.database.driver.Driver;
 import nl.svsticky.crazy88.database.model.GameState;
@@ -28,9 +29,9 @@ public class EndGameCommand implements CommandHandler {
         GameState gameState = new GameState(driver);
         try {
             gameState.setIsGameRunning(false);
-            replyCallback.reply("Done! It's over.").queue();
+            replyCallback.reply(Replies.GAME_ENDED).queue();
         } catch (SQLException e) {
-            replyCallback.reply("Ouch, something went wrong").queue();
+            replyCallback.reply(Replies.ERROR).queue();
         }
     }
 
