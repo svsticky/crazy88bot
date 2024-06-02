@@ -3,6 +3,7 @@ package nl.svsticky.crazy88.command.handler;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import nl.svsticky.crazy88.App;
 import nl.svsticky.crazy88.command.CommandData;
 import nl.svsticky.crazy88.command.CommandHandler;
 import nl.svsticky.crazy88.command.CommandName;
@@ -39,23 +40,33 @@ public class IamHelperCommand implements CommandHandler {
                 .map(OptionMapping::getAsInt);
 
         if(givenPassword.isEmpty()) {
-            replyCallback.reply(Replies.HELPER_PASSWORD_MISSING).queue();
+            replyCallback.reply(Replies.IAMHELPER_PASSWORD_MISSING).queue();
             return;
         }
 
         if(givenHelperStationId.isEmpty()) {
-            replyCallback.reply(Replies.HELPER_STATION_ID_MISSING).queue();
+            replyCallback.reply(Replies.IAMHELPER_STATION_ID_MISSING).queue();
             return;
         }
 
         if(!givenPassword.get().equals(config.helper.password)) {
-            replyCallback.reply(Replies.HELPER_PASSWORD_INCORRECT).queue();
+            replyCallback.reply(Replies.IAMHELPER_PASSWORD_INCORRECT).queue();
+            return;
+        }
+
+        if(config.locations.get(givenHelperStationId.get()) == null) {
+            replyCallback.reply(Replies.IAMHELPER_LOCATION_UNKNOWN).queue();
             return;
         }
 
         try {
             Optional<User> user = User.getById(this.driver, userId);
             if(user.isPresent()) {
+                if(user.get().userType == User.UserType.HELPER) {
+                    replyCallback.reply(Replies.IAMHELPER_ALREADY_HELPER).queue();
+                    return;
+                }
+
                 if(user.get().userType != User.UserType.ADMIN) {
                     user.get().setUserType(User.UserType.HELPER);
                 }
@@ -66,10 +77,11 @@ public class IamHelperCommand implements CommandHandler {
             }
         } catch (SQLException e) {
             replyCallback.reply(Replies.ERROR).queue();
+            App.getLogger().error(e);
             return;
         }
 
-        replyCallback.reply(Replies.USER_IS_NOW_HELPER).queue();
+        replyCallback.reply(Replies.IAMHELPER_USER_IS_NOW_HELPER).queue();
     }
 
     @Override

@@ -17,6 +17,7 @@ import nl.svsticky.crazy88.database.model.User;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class UnlockCommand implements CommandHandler {
@@ -31,11 +32,9 @@ public class UnlockCommand implements CommandHandler {
 
     @Override
     public void handle(IReplyCallback replyCallback, long userId, List<OptionMapping> options) {
-        // The unlock command can be slow
-        InteractionHook interactionHook = replyCallback.deferReply().complete();
 
         Optional<Integer> givenTeamId = options.stream()
-                .filter(v -> v.getName().equals("teamId"))
+                .filter(v -> v.getName().equals("teamid"))
                 .findFirst()
                 .map(OptionMapping::getAsInt);
 
@@ -73,11 +72,22 @@ public class UnlockCommand implements CommandHandler {
 
             // Mark the assignments as unlocked
             Team team = mTeam.get();
-            team.unlockAssignments(locationId, config.locations.get(locationId).assignments);
+
+            // Check if the team already has unlocked this location
+            if(team.getAvailableAssignments().stream().anyMatch(v -> v.locationId() == locationId)) {
+                replyCallback.reply(Replies.UNLOCK_ALREADY_UNLOCKED).queue();
+                return;
+            }
+
+            team.unlockAssignments(
+                    locationId,
+                    config.locations.get(locationId).assignments
+            );
 
             // Get the members of the team
             teamMemberIds = User.getForTeam(driver, team.teamId).stream().map(v -> v.userId).toList();
         } catch (SQLException e) {
+            App.getLogger().error(e);
             replyCallback.reply(Replies.ERROR).queue();
             return;
         }
@@ -85,20 +95,21 @@ public class UnlockCommand implements CommandHandler {
         // Build the reply to all team members
         StringBuilder sb = new StringBuilder();
         sb.append("Je hebt nieuwe oprdachten ontrendeld:\n");
-        for(String assignment : config.locations.get(locationId).assignments) {
-            sb.append(String.format("- %s\n", assignment));
+        for(Map.Entry<Integer, String> entry : config.locations.get(locationId).assignments.entrySet()) {
+            sb.append(String.format("%d. %s\n", entry.getKey(), entry.getValue()));
         }
 
         // Send the assignments to all team members
         for(long teamMemberId : teamMemberIds) {
-            net.dv8tion.jda.api.entities.User user = App.getJdaInstance().getUserById(teamMemberId);
-            user.openPrivateChannel()
-                    .flatMap((pc) -> pc.sendMessage(sb.toString()))
+            App.getLogger().info("Sending assignments to {}", teamMemberId);
+            App.getJdaInstance().retrieveUserById(teamMemberId)
+                    .flatMap(net.dv8tion.jda.api.entities.User::openPrivateChannel)
+                    .flatMap(pc -> pc.sendMessage(sb.toString()))
                     .queue();
         }
 
         // Inform the helper
-        interactionHook.editOriginal(Replies.UNLOCK_NEW_ASSIGNMENTS_UNLOCKED).queue();
+        replyCallback.reply(Replies.UNLOCK_NEW_ASSIGNMENTS_UNLOCKED).queue();
     }
 
     @Override
@@ -107,7 +118,7 @@ public class UnlockCommand implements CommandHandler {
                 CommandName.UNLOCK,
                 "Unlock new assignments for a team (Helpers only)",
                 new CommandOption[] {
-                        new CommandOption(OptionType.INTEGER, "teamId", "Het team-nummer")
+                        new CommandOption(OptionType.INTEGER, "teamid", "Het team-nummer")
                 }
         );
     }

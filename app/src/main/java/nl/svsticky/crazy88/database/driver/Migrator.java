@@ -41,12 +41,18 @@ public class Migrator {
 
         for (DiskMigration migration : toApply) {
             App.getLogger().info("Applying migration {}: {}", migration.version(), migration.name());
-            App.getLogger().debug(
-                    "Applying SQL: {}", migration.sql()
-            );
 
-            PreparedStatement p = this.driver.getConnection().prepareStatement(migration.sql());
-            p.execute();
+            for(String part :  migration.sql().split(Pattern.quote("\n\n"))) {
+                if(part.trim().isEmpty()) continue;
+
+                App.getLogger().debug(
+                        "Applying SQL: \n'{}'", part
+                );
+
+                PreparedStatement p = this.driver.getConnection().prepareStatement(part);
+                p.execute();
+            }
+
 
             PreparedStatement p1 = this.driver.getConnection().prepareStatement(
                     "INSERT INTO __crazy88_migrations (version,name) VALUES (?, ?)"

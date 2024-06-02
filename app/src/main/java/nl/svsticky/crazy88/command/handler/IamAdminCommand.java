@@ -34,12 +34,12 @@ public class IamAdminCommand implements CommandHandler {
                 .map(OptionMapping::getAsString);
 
         if(givenPassword.isEmpty()) {
-            replyCallback.reply(Replies.ADMIN_PASSWORD_MISSING).queue();
+            replyCallback.reply(Replies.IAMADMIN_PASSWORD_MISSING).queue();
             return;
         }
 
         if(!givenPassword.get().equals(config.admin.password)) {
-            replyCallback.reply(Replies.ADMIN_PASSWORD_INCORRECT).queue();
+            replyCallback.reply(Replies.IAMADMIN_PASSWORD_INCORRECT).queue();
             return;
         }
 
@@ -55,7 +55,7 @@ public class IamAdminCommand implements CommandHandler {
             return;
         }
 
-        replyCallback.reply(Replies.USER_IS_NOW_ADMIN).queue();
+        replyCallback.reply(Replies.IAMADMIN_USER_IS_NOW_ADMIN).queue();
     }
 
     @Override

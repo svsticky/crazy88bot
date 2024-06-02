@@ -42,6 +42,7 @@ public class App {
 
         ConfigModel config = openConfig();
 
+
         Driver database = openDatabase(config.database);
         openJda(config, database);
     }
@@ -69,7 +70,9 @@ public class App {
             jdaInstance = JDABuilder.createLight(config.discord.token)
                     .addEventListeners(new SlashCommandListener(commandManager))
                     .setEnabledIntents(
-                            GatewayIntent.DIRECT_MESSAGES
+                            GatewayIntent.GUILD_MEMBERS,
+                            GatewayIntent.DIRECT_MESSAGES,
+                            GatewayIntent.GUILD_PRESENCES
                     )
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .build()

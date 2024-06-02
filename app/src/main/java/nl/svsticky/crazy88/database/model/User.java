@@ -35,8 +35,8 @@ public class User {
         PreparedStatement pr = driver.getConnection().prepareStatement("INSERT INTO users (user_id, user_type, team_id, helper_station_id) VALUES (?, ?, ?, ?)");
         pr.setLong(1, userId);
         pr.setString(2, userType.name());
-        pr.setInt(3, teamId.orElse(null));
-        pr.setInt(4, helperStationId.orElse(null));
+        pr.setObject(3, teamId.orElse(null));
+        pr.setObject(4, helperStationId.orElse(null));
 
         pr.execute();
 
@@ -94,7 +94,7 @@ public class User {
     }
 
     public void setHelperStationId(Optional<Integer> helperStationId) throws SQLException {
-        PreparedStatement pr = driver.getConnection().prepareStatement("UPDATE users SET helperStationId = ? WHERE user_id = ?");
+        PreparedStatement pr = driver.getConnection().prepareStatement("UPDATE users SET helper_station_id = ? WHERE user_id = ?");
         pr.setInt(1, helperStationId.orElse(null));
         pr.setLong(2, this.userId);
 
@@ -104,7 +104,7 @@ public class User {
     }
 
     public void setUserType(UserType userType) throws SQLException {
-        PreparedStatement pr = driver.getConnection().prepareStatement("UPDATE users SET userType = ? WHERE user_id = ?");
+        PreparedStatement pr = driver.getConnection().prepareStatement("UPDATE users SET user_type = ? WHERE user_id = ?");
         pr.setString(1, userType.name());
         pr.setLong(2, this.userId);
 

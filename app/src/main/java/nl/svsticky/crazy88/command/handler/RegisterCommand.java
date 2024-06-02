@@ -31,7 +31,7 @@ public class RegisterCommand implements CommandHandler {
     @Override
     public void handle(IReplyCallback replyCallback, long userId, List<OptionMapping> options) {
         Optional<Integer> givenTeamId = options.stream()
-                .filter(v -> v.getName().equals("teamId"))
+                .filter(v -> v.getName().equals("teamid"))
                 .findFirst()
                 .map(OptionMapping::getAsInt);
 
@@ -48,6 +48,19 @@ public class RegisterCommand implements CommandHandler {
         }
 
         try {
+            // Check if the user is already in a different team
+            Optional<User> mUser = User.getById(this.driver, userId);
+            if(mUser.isPresent() && mUser.get().teamId.isPresent()) {
+                // IntelliJ cant reason through it
+                //noinspection OptionalGetWithoutIsPresent
+                if(mUser.get().teamId.get().equals(teamId)) {
+                    replyCallback.reply(Replies.REGISTER_ALREADY_REGISTER_SAME_TEAM).queue();
+                } else {
+                    replyCallback.reply(Replies.REGISTER_ALREADY_REGISTER_DIFFERENT_TEAM).queue();
+                }
+                return;
+            }
+
             // Create the team
             Optional<Team> mTeam = Team.getbyId(this.driver, teamId);
             Team team;
@@ -61,7 +74,6 @@ public class RegisterCommand implements CommandHandler {
             team.unlockLocation(startingLocationId);
 
             // Make sure the user exists and is in the team
-            Optional<User> mUser = User.getById(this.driver, userId);
             if(mUser.isEmpty()) {
                 User.create(this.driver, userId, User.UserType.REGULAR, Optional.of(teamId), Optional.empty());
             } else {
@@ -95,7 +107,7 @@ public class RegisterCommand implements CommandHandler {
                 CommandName.REGISTER,
                 "Register your team",
                 new CommandOption[]{
-                        new CommandOption(OptionType.INTEGER, "teamId", "Het toegewezen teamnummer.")
+                        new CommandOption(OptionType.INTEGER, "teamid", "Het toegewezen teamnummer.")
                 }
         );
     }

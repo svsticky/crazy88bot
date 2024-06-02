@@ -6,7 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class Team {
@@ -15,7 +17,7 @@ public class Team {
     public final int teamId;
 
     public record AvailableLocation(int id) {}
-    public record AvailableAssignment(int locationId, String assignment) {}
+    public record AvailableAssignment(int id, int locationId, String assignment) {}
 
     private Team(Driver driver, int teamId) {
         this.driver = driver;
@@ -64,6 +66,7 @@ public class Team {
         List<AvailableAssignment> availableAssignments = new ArrayList<>();
         while(rs.next()) {
             availableAssignments.add(new AvailableAssignment(
+                    rs.getInt("assignment_id"),
                     rs.getInt("location_id"),
                     rs.getString("assignment")
             ));
@@ -80,12 +83,13 @@ public class Team {
         pr.execute();
     }
 
-    public void unlockAssignments(int locationId, String[] assignments) throws SQLException {
-        for (String assignment : assignments) {
-            PreparedStatement pr = driver.getConnection().prepareStatement("INSERT INTO team_available_assignments (team_id, location_id, assignment) VALUES (?, ?, ?)");
-            pr.setInt(1, teamId);
-            pr.setInt(2, locationId);
-            pr.setString(3, assignment);
+    public void unlockAssignments(int locationId, HashMap<Integer, String> assignments) throws SQLException {
+        for (Map.Entry<Integer, String> entry : assignments.entrySet()) {
+            PreparedStatement pr = driver.getConnection().prepareStatement("INSERT INTO team_available_assignments (assignment_id, team_id, location_id, assignment) VALUES (?, ?, ?, ?)");
+            pr.setInt(1, entry.getKey());
+            pr.setInt(2, teamId);
+            pr.setInt(3, locationId);
+            pr.setString(4, entry.getValue());
 
             pr.execute();
         }

@@ -16,5 +16,7 @@ public class ConfigModel {
     @Required
     public DatabaseModel database;
     @Required
+    public SubmitModel submit;
+    @Required
     public HashMap<Integer, Integer> teamStartingLocations;
 }

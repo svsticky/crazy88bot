@@ -7,6 +7,7 @@ public enum CommandName {
     UNLOCK("unlock"),
     SUBMIT("submit"),
     HELPER("helper"),
+    MESSAGEME("messageme"),
     ENDGAME("endgame");
 
     public final String command;
