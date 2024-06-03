@@ -68,7 +68,7 @@ public class SubmitCommand implements CommandHandler {
             return;
         }
 
-        int teamId;
+        Team team;
         try {
             // Fetch the associated user
             Optional<User> mUser = User.getById(driver, userId);
@@ -90,8 +90,7 @@ public class SubmitCommand implements CommandHandler {
                 return;
             }
 
-            Team team = mTeam.get();
-            teamId = team.teamId;
+            team = mTeam.get();
             List<Team.AvailableAssignment> availableAssignments = team.getAvailableAssignments();
             List<Integer> unlockedIds = availableAssignments.stream().map(Team.AvailableAssignment::id).toList();
 
@@ -112,7 +111,7 @@ public class SubmitCommand implements CommandHandler {
             // Example: 'path/to/my/submissions/3_4.png',
             // indicating assignment 4 for team 3.
             Path path = Paths.get(config.submit.submissionDirectory, String.format("%d_%d.%s",
-                    teamId,
+                    team.teamId,
                     givenAssignmentId.get(),
                     attachment.getFileExtension()
             ));
@@ -144,6 +143,15 @@ public class SubmitCommand implements CommandHandler {
             fc.transferFrom(rbc, 0, attachment.getSize());
             fos.close();
         } catch (IOException | URISyntaxException e) {
+            App.getLogger().error(e);
+            interactionHook.editOriginal(Replies.ERROR).queue();
+            return;
+        }
+
+        // Mark the assignment as submitted in the database
+        try {
+            team.submitAssignment(givenAssignmentId.get());
+        } catch (SQLException e) {
             App.getLogger().error(e);
             interactionHook.editOriginal(Replies.ERROR).queue();
             return;

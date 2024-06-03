@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Migration manager
+ */
 public class Migrator {
     private final List<Migration> migrations;
     private final Driver driver;
@@ -30,6 +33,11 @@ public class Migrator {
         }
     }
 
+    /**
+     * Apply pending migrations
+     * @throws SQLException SQL error
+     * @throws IOException IO error
+     */
     public void applyMigrations() throws SQLException, IOException {
         Stream<DiskMigration> diskMigrations = this.loadDiskMigrations();
         List<DiskMigration> toApply = diskMigrations
@@ -69,6 +77,11 @@ public class Migrator {
         }
     }
 
+    /**
+     * Load migrations stored inside the JAR file
+     * @return The migrations
+     * @throws IOException IO error
+     */
     private Stream<DiskMigration> loadDiskMigrations() throws IOException {
         List<String> resourceFiles = this.getResourceFiles("/migrations");
         return resourceFiles
@@ -99,6 +112,12 @@ public class Migrator {
                 });
     }
 
+    /**
+     * Get all resourcefiles in the JAR at the path provided
+     * @param path The path inside the JAR
+     * @return A list of files in the directory
+     * @throws IOException IO error
+     */
     private List<String> getResourceFiles(String path) throws IOException {
         List<String> filenames = new ArrayList<>();
 
@@ -115,6 +134,11 @@ public class Migrator {
         return filenames;
     }
 
+    /**
+     * Get a JAR resource as a stream
+     * @param resource The full path to the resource inside the JAR
+     * @return The stream to the resource
+     */
     private InputStream getResourceAsStream(String resource) {
         final InputStream in
                 = getContextClassLoader().getResourceAsStream(resource);
@@ -122,10 +146,19 @@ public class Migrator {
         return in == null ? getClass().getResourceAsStream(resource) : in;
     }
 
+    /**
+     * Get the context class loader
+     * @return the context class loader
+     */
     private ClassLoader getContextClassLoader() {
         return Thread.currentThread().getContextClassLoader();
     }
 
+    /**
+     * Load migrations which have already been applied
+     * @return List of previously applied migrations
+     * @throws SQLException SQL error
+     */
     private List<Migration> loadExistingMigrations() throws SQLException {
         PreparedStatement s = this.driver.getConnection().prepareStatement(
                 String.format("SELECT version,name FROM %s", MIGRATION_TABLE)
@@ -144,6 +177,11 @@ public class Migrator {
         return migrations;
     }
 
+    /**
+     * Check if the migrations table exists
+     * @return Whether the table exists
+     * @throws SQLException SQL error
+     */
     private boolean migrationTableExists() throws SQLException {
         DatabaseMetaData metdata = this.driver.getConnection().getMetaData();
         ResultSet tables = metdata.getTables(null, null, MIGRATION_TABLE, null);

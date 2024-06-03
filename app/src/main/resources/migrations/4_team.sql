@@ -13,3 +13,8 @@ CREATE TABLE team_available_assignments (
     location_id INT NOT NULL,
     assignment TEXT
 );
+
+CREATE TABLE team_submitted_assignments (
+    assignment_id INT NOT NULL,
+    team_id INT NOT NULL
+);

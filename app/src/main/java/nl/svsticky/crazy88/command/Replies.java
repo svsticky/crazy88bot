@@ -1,5 +1,8 @@
 package nl.svsticky.crazy88.command;
 
+/**
+ * Possible command replies
+ */
 public class Replies {
     public static final String ERROR = "Er is iets helemaal fout gegaan. Probeer 't straks nog een keer";
 

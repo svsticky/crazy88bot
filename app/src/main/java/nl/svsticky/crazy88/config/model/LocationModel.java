@@ -9,6 +9,10 @@ public class LocationModel {
     public String geoLong;
     @Required
     public String geoLat;
+    /**
+     * A map of the assignments.
+     * The keys must be > 0 and must be continuous
+     */
     @Required
     public HashMap<Integer, String> assignments;
 }

@@ -9,6 +9,9 @@ public class ConfigModel {
     public AdminModel admin;
     @Required
     public HelperModel helper;
+    /**
+     * A map mapping the ID of a location to it's configuration
+     */
     @Required
     public HashMap<Integer, LocationModel> locations;
     @Required
@@ -17,6 +20,9 @@ public class ConfigModel {
     public DatabaseModel database;
     @Required
     public SubmitModel submit;
+    /**
+     * A map mapping the ID of a team to the ID of a location
+     */
     @Required
     public HashMap<Integer, Integer> teamStartingLocations;
 }

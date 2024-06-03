@@ -43,6 +43,16 @@ public class Team {
         return Optional.of(new Team(driver, teamId));
     }
 
+    public static List<Team> getTeams(Driver driver) throws SQLException {
+        PreparedStatement pr = driver.getConnection().prepareStatement("SELECT * FROM teams");
+        ResultSet rs = pr.executeQuery();
+        List<Team> teams = new ArrayList<>();
+        while(rs.next()) {
+            teams.add(new Team(driver, rs.getInt("team_id")));
+        }
+        return teams;
+    }
+
     public List<AvailableLocation> getAvailableLocations() throws SQLException {
         PreparedStatement pr = driver.getConnection().prepareStatement("SELECT * FROM team_available_locations WHERE team_id = ?");
         pr.setInt(1, teamId);
@@ -93,5 +103,25 @@ public class Team {
 
             pr.execute();
         }
+    }
+
+    public List<Integer> getSubmittedAssignments() throws SQLException {
+        PreparedStatement pr = driver.getConnection().prepareStatement("SELECT * FROM team_submitted_assignments WHERE team_id = ?");
+        pr.setInt(1, teamId);
+        ResultSet rs = pr.executeQuery();
+        List<Integer> assignments = new ArrayList<>();
+        while(rs.next()) {
+            assignments.add(rs.getInt("assignment_id"));
+        }
+        return assignments;
+    }
+
+    public void submitAssignment(int assignmentId) throws SQLException {
+        if(getSubmittedAssignments().contains(assignmentId)) return;
+
+        PreparedStatement pr = driver.getConnection().prepareStatement("INSERT INTO team_submitted_assignments (assignment_id, team_id) VALUES (?, ?)");
+        pr.setInt(1, assignmentId);
+        pr.setInt(2, teamId);
+        pr.execute();
     }
 }

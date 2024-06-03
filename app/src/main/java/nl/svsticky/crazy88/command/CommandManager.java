@@ -27,6 +27,10 @@ public class CommandManager {
         };
     }
 
+    /**
+     * Get available command handlers
+     * @return The available command handlers
+     */
     public CommandHandler[] getHandlers() {
         return this.handlers;
     }

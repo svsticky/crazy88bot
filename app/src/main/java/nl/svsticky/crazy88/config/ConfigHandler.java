@@ -11,6 +11,13 @@ import java.nio.file.Path;
 
 public class ConfigHandler {
 
+    /**
+     * Open the configuration file
+     * @param path The path to the configuration file
+     * @return The parsed configuration file
+     * @throws IOException IO error
+     * @throws InvalidConfigurationException The configuration was invalid
+     */
     public static ConfigModel open(Path path) throws IOException, InvalidConfigurationException {
         if(!Files.exists(path)) {
             throw new IOException("Configuration file does not exist: " + path);
@@ -29,6 +36,11 @@ public class ConfigHandler {
         return config;
     }
 
+    /**
+     * Validate the configuration matches requirments
+     * @param model The object to validate
+     * @throws InvalidConfigurationException The configuration was invalid
+     */
     private static void validateConfig(ConfigModel model) throws InvalidConfigurationException {
         Pair<Boolean, String> validationResult = ClassValidator.validateType(model);
 

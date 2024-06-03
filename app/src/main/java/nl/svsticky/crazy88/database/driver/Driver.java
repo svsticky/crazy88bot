@@ -7,7 +7,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-
+/**
+ * The database driver
+ */
 public class Driver {
     private final Connection connection;
 
@@ -19,10 +21,19 @@ public class Driver {
         );
     }
 
+    /**
+     * Get a connection to the database
+     * @return A connection
+     */
     public Connection getConnection() {
         return connection;
     }
 
+    /**
+     * Apply pending migrations
+     * @throws IOException IO error
+     * @throws SQLException SQL error
+     */
     public void applyMigrations() throws IOException, SQLException {
         Migrator m = new Migrator(this);
         m.applyMigrations();
