@@ -2,6 +2,7 @@ package nl.svsticky.crazy88.http;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import net.dv8tion.jda.api.exceptions.HttpException;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,13 +15,14 @@ public abstract class HttpResponse {
 
     public HttpResponse(HttpRequest request, int status) throws IOException {
         this.exchange = request.getExchange();
+        setCors(exchange);
         exchange.sendResponseHeaders(status, 0);
     }
 
     public HttpResponse(HttpRequest request, int status, byte[] body) throws IOException {
         this.exchange = request.getExchange();
         hasBody = true;
-
+        setCors(exchange);
         exchange.sendResponseHeaders(status, body.length);
         setBody(exchange, body);
     }
@@ -29,6 +31,7 @@ public abstract class HttpResponse {
         this.exchange = request.getExchange();
         hasBody = true;
         setHeaders(exchange, headers);
+        setCors(exchange);
         exchange.sendResponseHeaders(status, 0);
     }
 
@@ -36,8 +39,13 @@ public abstract class HttpResponse {
         this.exchange = request.getExchange();
         hasBody = true;
         setHeaders(exchange, headers);
+        setCors(exchange);
         exchange.sendResponseHeaders(status, body.length);
         setBody(exchange, body);
+    }
+
+    private static void setCors(HttpExchange exchange) {
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
     }
 
     /**
