@@ -7,4 +7,4 @@ build
 .idea/
 config.json
 
-submissions/
+bot/submissions/*
