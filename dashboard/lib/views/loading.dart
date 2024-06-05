@@ -1,34 +1,38 @@
 import 'dart:async';
+import 'dart:typed_data';
 
-import 'package:crazy88_dashboard/service/api.dart';
 import 'package:crazy88_dashboard/service/favicon.dart';
 import 'package:flutter/material.dart';
 
 class LoadingView extends StatefulWidget {
-  const LoadingView({super.key});
+  final Function() onComplete;
+
+  const LoadingView({super.key, required this.onComplete});
 
   @override
   State<LoadingView> createState() => _LoadingViewState();
 }
 
 class _LoadingViewState extends State<LoadingView> {
-  String? _faviconUrl;
+  Uint8List? _favicon;
   String? _error;
   bool _loading = true;
+
+  static const double _iconSize = 80;
 
   @override
   void initState() {
    super.initState();
 
-   Timer(const Duration(seconds: 3), () => _loadIcon());
+   WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _loadIcon());
   }
 
   void _loadIcon() async {
-    String? s = await getFavicon();
+    Uint8List? s = await getFavicon();
     if(context.mounted) {
       if(s != null) {
         setState(() {
-          _faviconUrl = s;
+          _favicon = s;
           _loading = false;
         });
       } else {
@@ -50,7 +54,7 @@ class _LoadingViewState extends State<LoadingView> {
                     setState(() {
                       _loading = true;
                       _error = null;
-                      _faviconUrl = null;
+                      _favicon = null;
                     });
                     _loadIcon();
                   });
@@ -67,8 +71,13 @@ class _LoadingViewState extends State<LoadingView> {
     Widget content;
     if(_loading) {
       content = _getLoader();
-    } else if (_faviconUrl != null) {
+    } else if (_favicon != null) {
       content = _getFavicon();
+      Timer(const Duration(seconds: 2), () {
+        if(context.mounted) {
+          widget.onComplete();
+        }
+      });
     } else {
       content = _getErrorIcon();
     }
@@ -79,27 +88,27 @@ class _LoadingViewState extends State<LoadingView> {
       ),
     );
   }
-  
+
   Widget _getFavicon() {
     return SizedBox(
-      width: 50,
-      height: 50,
-      child: Image.network(_faviconUrl!),
+      width: _iconSize,
+      height: _iconSize,
+      child: Image.memory(_favicon!),
     );
   }
 
   Widget _getErrorIcon() {
     return const SizedBox(
-      width: 50,
-      height: 50,
+      width: _iconSize,
+      height: _iconSize,
       child: Icon(Icons.warning_amber, color: Colors.redAccent, size: 50),
     );
   }
 
   Widget _getLoader() {
     return const SizedBox(
-      width: 50,
-      height: 50,
+      width: _iconSize,
+      height: _iconSize,
       child: CircularProgressIndicator(),
     );
   }
