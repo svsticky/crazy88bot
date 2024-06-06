@@ -51,7 +51,7 @@ public class ListSubmissionsRoute implements RequestHandler {
             }
 
             // List the submissions
-            submissions = team.get().getSubmittedAssignments();
+            submissions = team.get().getSubmittedAssignments().stream().map(Team.SubmittedAssignment::id).toList();
         } catch (SQLException e) {
             App.getLogger().error(e);
             return new EmptyHttpResponse(request, 500);

@@ -5,6 +5,7 @@ plugins {
 
 version = "1.0.0"
 
+
 repositories {
     mavenCentral()
 }
@@ -20,6 +21,8 @@ dependencies {
     implementation('net.dv8tion:JDA:5.0.0-beta.24')
     implementation('mysql:mysql-connector-java:8.0.33')
 }
+
+sourceCompatibility = '1.21'
 
 application {
     mainClass = 'nl.svsticky.crazy88.App'

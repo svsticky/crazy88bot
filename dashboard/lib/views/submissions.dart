@@ -34,8 +34,8 @@ class _SubmissionsViewState extends State<SubmissionsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
-          children: [
+        title: Row(
+          children: const [
             SizedBox(
               width: 30,
               height: 30,

@@ -16,5 +16,6 @@ CREATE TABLE team_available_assignments (
 
 CREATE TABLE team_submitted_assignments (
     assignment_id INT NOT NULL,
-    team_id INT NOT NULL
+    team_id INT NOT NULL,
+    assigned_grade INT DEFAULT NULL
 );

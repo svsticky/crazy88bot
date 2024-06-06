@@ -1,5 +1,6 @@
 package nl.svsticky.crazy88.database.model;
 
+import nl.svsticky.crazy88.database.driver.DatabaseUtil;
 import nl.svsticky.crazy88.database.driver.Driver;
 
 import java.sql.PreparedStatement;
@@ -18,6 +19,7 @@ public class Team {
 
     public record AvailableLocation(int id) {}
     public record AvailableAssignment(int id, int locationId, String assignment) {}
+    public record SubmittedAssignment(int id, Optional<Integer> assignedGrade) {}
 
     private Team(Driver driver, int teamId) {
         this.driver = driver;
@@ -29,6 +31,7 @@ public class Team {
         pr.setInt(1, teamId);
 
         pr.execute();
+        pr.close();
 
         return new Team(driver, teamId);
     }
@@ -40,6 +43,7 @@ public class Team {
         ResultSet rs = pr.executeQuery();
         if(!rs.next()) return Optional.empty();
 
+        pr.close();
         return Optional.of(new Team(driver, teamId));
     }
 
@@ -50,6 +54,8 @@ public class Team {
         while(rs.next()) {
             teams.add(new Team(driver, rs.getInt("team_id")));
         }
+
+        pr.close();
         return teams;
     }
 
@@ -65,6 +71,7 @@ public class Team {
             ));
         }
 
+        pr.close();
         return availableLocations;
     }
 
@@ -82,6 +89,7 @@ public class Team {
             ));
         }
 
+        pr.close();
         return availableAssignments;
     }
 
@@ -91,6 +99,7 @@ public class Team {
         pr.setInt(2, id);
 
         pr.execute();
+        pr.close();
     }
 
     public void unlockAssignments(int locationId, HashMap<Integer, String> assignments) throws SQLException {
@@ -102,26 +111,45 @@ public class Team {
             pr.setString(4, entry.getValue());
 
             pr.execute();
+            pr.close();
         }
     }
 
-    public List<Integer> getSubmittedAssignments() throws SQLException {
+    public List<SubmittedAssignment> getSubmittedAssignments() throws SQLException {
         PreparedStatement pr = driver.getConnection().prepareStatement("SELECT * FROM team_submitted_assignments WHERE team_id = ?");
         pr.setInt(1, teamId);
         ResultSet rs = pr.executeQuery();
-        List<Integer> assignments = new ArrayList<>();
+        List<SubmittedAssignment> assignments = new ArrayList<>();
+
         while(rs.next()) {
-            assignments.add(rs.getInt("assignment_id"));
+            assignments.add(new SubmittedAssignment(
+                    rs.getInt("assignment_id"),
+                    Optional.ofNullable(DatabaseUtil.getInteger(rs, "assigned_grade"))
+            ));
         }
+
+        pr.close();
         return assignments;
     }
 
     public void submitAssignment(int assignmentId) throws SQLException {
-        if(getSubmittedAssignments().contains(assignmentId)) return;
+        if(getSubmittedAssignments().stream().anyMatch(v -> v.id == assignmentId)) return;
 
         PreparedStatement pr = driver.getConnection().prepareStatement("INSERT INTO team_submitted_assignments (assignment_id, team_id) VALUES (?, ?)");
         pr.setInt(1, assignmentId);
         pr.setInt(2, teamId);
         pr.execute();
+        pr.close();
+    }
+    public void setAssignmentGrade(int assignmentId, int grade) throws SQLException {
+        if(getSubmittedAssignments().stream().noneMatch(v -> v.id == assignmentId)) return;
+
+        PreparedStatement pr = driver.getConnection().prepareStatement("UPDAET team_submitted_assignments SET assigned_grade = ? WHERE assignment_id = ? AND team_id = ?");
+        pr.setInt(1, grade);
+        pr.setInt(2, assignmentId);
+        pr.setInt(3, teamId);
+
+        pr.execute();
+        pr.close();
     }
 }

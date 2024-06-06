@@ -9,15 +9,15 @@ import nl.svsticky.crazy88.http.RequestHandler;
 import nl.svsticky.crazy88.http.response.ByteHttpResponse;
 import nl.svsticky.crazy88.http.response.EmptyHttpResponse;
 import nl.svsticky.crazy88.http.response.StringHttpResponse;
+import nl.svsticky.crazy88.http.routes.Either;
+import nl.svsticky.crazy88.http.routes.ParameterUtil;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class GetSubmissionRoute implements RequestHandler {
     private final ConfigModel configModel;
@@ -28,20 +28,10 @@ public class GetSubmissionRoute implements RequestHandler {
         this.driver = driver;
     }
 
-    private record Either<L, R>(Optional<L> left, Optional<R> right) {
-        public static <L, R> Either<L, R> left(L left) {
-            return new Either<>(Optional.of(left), Optional.empty());
-        }
-
-        public static <L, R> Either<L, R> right(R right) {
-            return new Either<>(Optional.empty(), Optional.of(right));
-        }
-    }
-
     @Override
     public HttpResponse handle(HttpRequest request) throws IOException {
-        Either<Integer, HttpResponse> mTeamId = getIntParameter(request, "teamId");
-        Either<Integer, HttpResponse> mAssignmentId = getIntParameter(request, "assignmentId");
+        Either<Integer, HttpResponse> mTeamId = ParameterUtil.getIntParameter(request, "teamId");
+        Either<Integer, HttpResponse> mAssignmentId = ParameterUtil.getIntParameter(request, "assignmentId");
 
         if(mTeamId.right().isPresent()) {
             return mTeamId.right().get();
@@ -87,20 +77,5 @@ public class GetSubmissionRoute implements RequestHandler {
         if(ext.equals("jpg")) ext = "jpeg";
 
         return new ByteHttpResponse(request, 200, contents, String.format("image/%s", ext));
-    }
-
-    private Either<Integer, HttpResponse> getIntParameter(HttpRequest request, String name) throws IOException {
-        try {
-            Optional<String> mTeamId = request.getQueryParameter(name);
-            if(mTeamId.isEmpty()) {
-                return Either.right(new StringHttpResponse(request, 400, String.format("Missing required parameter '%s'", name)));
-            }
-
-            return Either.left(Integer.parseInt(mTeamId.get()));
-        } catch (NumberFormatException e) {
-            return Either.right(new StringHttpResponse(request, 400, String.format("Invalid number for parameter '%s'", name)));
-        } catch (IllegalArgumentException e) {
-            return Either.right(new StringHttpResponse(request, 400, e.getMessage()));
-        }
     }
 }
