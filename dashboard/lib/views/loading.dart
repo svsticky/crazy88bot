@@ -50,7 +50,7 @@ class _LoadingViewState extends State<LoadingView> {
                   ScaffoldMessenger
                       .of(context)
                       .clearMaterialBanners();
-                  Timer(const Duration(seconds: 2), () {
+                  Timer(const Duration(milliseconds: 500), () {
                     setState(() {
                       _loading = true;
                       _error = null;

@@ -93,6 +93,24 @@ public class Team {
         return availableAssignments;
     }
 
+    public Optional<AvailableAssignment> getAvailableAssignmentById(int assignmentId) throws SQLException {
+        PreparedStatement pr = driver.getConnection().prepareStatement("SELECT * FROM team_available_assignments WHERE assignment_id = ? AND team_id = ?");
+        pr.setInt(1, assignmentId);
+        pr.setInt(2, teamId);
+
+        ResultSet rs = pr.executeQuery();
+        if(rs.next()) {
+            return Optional.of(new AvailableAssignment(
+                    rs.getInt("assignment_id"),
+                    rs.getInt("location_id"),
+                    rs.getString("assignment")
+            ));
+        }
+
+        pr.close();
+        return Optional.empty();
+    }
+
     public void unlockLocation(int id) throws SQLException {
         PreparedStatement pr = driver.getConnection().prepareStatement("INSERT INTO team_available_locations (team_id, location_id) VALUES (?, ?)");
         pr.setInt(1, teamId);
@@ -132,6 +150,25 @@ public class Team {
         return assignments;
     }
 
+    public Optional<SubmittedAssignment> getSubmittedAssignmentById(int assignmentId) throws SQLException {
+        PreparedStatement pr = driver.getConnection().prepareStatement("SELECT * FROM team_submitted_assignments WHERE assignment_id = ? AND team_id = ?");
+        pr.setInt(1, assignmentId);
+        pr.setInt(2, teamId);
+        ResultSet rs = pr.executeQuery();
+        if(rs.next()) {
+            Optional<SubmittedAssignment> val = Optional.of(new SubmittedAssignment(
+                    rs.getInt("assignment_id"),
+                    Optional.ofNullable(DatabaseUtil.getInteger(rs, "assigned_grade"))
+            ));
+
+            rs.close();
+            return val;
+        }
+
+        rs.close();
+        return Optional.empty();
+    }
+
     public void submitAssignment(int assignmentId) throws SQLException {
         if(getSubmittedAssignments().stream().anyMatch(v -> v.id == assignmentId)) return;
 
@@ -144,7 +181,7 @@ public class Team {
     public void setAssignmentGrade(int assignmentId, int grade) throws SQLException {
         if(getSubmittedAssignments().stream().noneMatch(v -> v.id == assignmentId)) return;
 
-        PreparedStatement pr = driver.getConnection().prepareStatement("UPDAET team_submitted_assignments SET assigned_grade = ? WHERE assignment_id = ? AND team_id = ?");
+        PreparedStatement pr = driver.getConnection().prepareStatement("UPDATE team_submitted_assignments SET assigned_grade = ? WHERE assignment_id = ? AND team_id = ?");
         pr.setInt(1, grade);
         pr.setInt(2, assignmentId);
         pr.setInt(3, teamId);

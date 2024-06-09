@@ -18,6 +18,7 @@ import nl.svsticky.crazy88.events.SlashCommandListener;
 import nl.svsticky.crazy88.http.HttpServer;
 import nl.svsticky.crazy88.http.routes.FaviconRoute;
 import nl.svsticky.crazy88.http.routes.submissions.GetSubmissionRoute;
+import nl.svsticky.crazy88.http.routes.submissions.GradeSubmissionRoute;
 import nl.svsticky.crazy88.http.routes.submissions.ListSubmissionsRoute;
 import nl.svsticky.crazy88.http.routes.teams.ListTeamsRoute;
 import org.apache.logging.log4j.LogManager;
@@ -58,8 +59,9 @@ public class App {
         HttpServer httpServer = new HttpServer(9001);
         httpServer.registerRoute("/favicon.ico", new FaviconRoute());
         httpServer.registerRoute("/teams/list", new ListTeamsRoute(driver));
-        httpServer.registerRoute("/submissions/list", new ListSubmissionsRoute(driver));
+        httpServer.registerRoute("/submissions/list", new ListSubmissionsRoute(driver, configModel));
         httpServer.registerRoute("/submissions", new GetSubmissionRoute(configModel, driver));
+        httpServer.registerRoute("/submissions/grade", new GradeSubmissionRoute(driver));
 
         try {
             httpServer.start();

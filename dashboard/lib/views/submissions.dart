@@ -1,7 +1,7 @@
 import 'package:crazy88_dashboard/components/SubmissionFullView.dart';
 import 'package:crazy88_dashboard/components/card_footer.dart';
-import 'package:crazy88_dashboard/service/api.dart';
 import 'package:crazy88_dashboard/service/submissions.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class SubmissionsView extends StatefulWidget {
@@ -23,6 +23,10 @@ class _SubmissionsViewState extends State<SubmissionsView> {
   }
 
   void _loadSubmissions() async {
+    setState(() {
+      _loading = true;
+    });
+
     List<Submission> submissions = await listAllSubmissions();
     setState(() {
       _submissions = submissions;
@@ -34,8 +38,8 @@ class _SubmissionsViewState extends State<SubmissionsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: const [
+        title: const Row(
+          children: [
             SizedBox(
               width: 30,
               height: 30,
@@ -43,7 +47,13 @@ class _SubmissionsViewState extends State<SubmissionsView> {
             ),
             Text("Inzendingen")
           ],
-        )
+        ),
+        actions: [
+          IconButton(
+            onPressed: _loadSubmissions,
+            icon: const Icon(Icons.refresh, color: Colors.white)
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -85,10 +95,19 @@ class _SubmissionsViewState extends State<SubmissionsView> {
         itemBuilder: (context, index) {
           Submission submission = _submissions![index];
           return Card(
-            elevation: 4 ,
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+              side: BorderSide(
+                color: _getBorderColor(_submissions![index]),
+                width: 2.0
+              ),
+            ),
             child: InkWell(
               onTap: () => {
                 showDialog(context: context, builder: (_) {
+                  _dialogIndex = index;
+
                   return StatefulBuilder(
                     builder: (context, setState) => SubmissionFullView(
                       items: _submissions!,
@@ -107,6 +126,9 @@ class _SubmissionsViewState extends State<SubmissionsView> {
                           _dialogIndex = nextIdx;
                         });
                       },
+                      grade: (grade) {
+                        setState(() => _submissions![index].grade = grade);
+                      },
                     ),
                   );
                 })
@@ -120,5 +142,13 @@ class _SubmissionsViewState extends State<SubmissionsView> {
         },
       ),
     );
+  }
+
+  Color _getBorderColor(Submission s) {
+    return s.grade == null
+        ? Colors.grey
+        : (s.grade == 0
+          ? Colors.redAccent
+          : Colors.green);
   }
 }

@@ -9,10 +9,37 @@ import 'package:http/http.dart' as http;
 class Submission {
   final int teamId;
   final int id;
+  final String assignment;
+  int? grade;
 
-  Submission({required this.teamId, required this.id});
+  Submission({required this.teamId, required this.id, required this.assignment, this.grade});
 
   String imageUrl() => "$url/submissions?teamId=$teamId&assignmentId=$id";
+
+  Future<bool> setGrade(int grade) async {
+    try {
+      Map<String, dynamic> body = {
+        'assignmentId': id,
+        'teamId': teamId,
+        'grade': grade
+      };
+
+      http.Response response = await http.post(Uri.parse("$url/submissions/grade"), body: jsonEncode(body), headers: {
+        'Content-Type': 'application/json'
+      });
+
+      bool ok = response.statusCode == 200;
+      if(ok) {
+        return ok;
+      } else {
+        debugPrint("Failed to set grade (${response.statusCode}): ${response.body}");
+        return false;
+      }
+    } on Exception catch(e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
 }
 
 Future<List<Submission>?> listSubmissions(int teamId) async {
@@ -21,7 +48,12 @@ Future<List<Submission>?> listSubmissions(int teamId) async {
     if(response.statusCode == 200) {
       Map<String, dynamic> payload = jsonDecode(response.body);
       List<dynamic> submitted = payload['submitted'];
-      return submitted.map((e) => Submission(teamId: teamId, id: e)).toList();
+      return submitted.map((map) => Submission(
+          teamId: teamId,
+          id: map['id'],
+          assignment: map['assignment'],
+          grade: map['grade'],
+      )).toList();
     } else {
       debugPrint("Failed to list submissions: ${response.statusCode}");
     }

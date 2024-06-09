@@ -60,7 +60,7 @@ public class HttpRequest {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
         int read = 0;
-        byte[] data = new byte[16384];
+        byte[] data = new byte[4096];
         while((read = is.read(data, 0, data.length)) != -1) {
             buffer.write(data, 0, read);
         }
