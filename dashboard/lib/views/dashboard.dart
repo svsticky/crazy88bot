@@ -1,6 +1,6 @@
 import 'package:crazy88_dashboard/components/card_footer.dart';
-import 'package:crazy88_dashboard/service/favicon.dart';
 import 'package:crazy88_dashboard/views/submissions.dart';
+import 'package:crazy88_dashboard/views/top_score.dart';
 import 'package:flutter/material.dart';
 
 class DashboardView extends StatelessWidget {
@@ -30,6 +30,11 @@ class DashboardView extends StatelessWidget {
                             icon: Icons.image,
                             text: "Inzendingen",
                             onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SubmissionsView())),
+                          ),
+                          DashboardButton(
+                            icon: Icons.star,
+                            text: "Topscores",
+                            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TopScoreView())),
                           )
                         ],
                       ),
@@ -55,19 +60,22 @@ class DashboardButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ButtonStyle(
-          elevation: MaterialStateProperty.all(8.0),
-          shape: MaterialStateProperty.all(RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0)
-          ))
-      ),
-      onPressed: onPressed,
-      child: Row(
-        children: [
-          Icon(icon),
-          Text(text)
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ElevatedButton(
+        style: ButtonStyle(
+            elevation: MaterialStateProperty.all(8.0),
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)
+            ))
+        ),
+        onPressed: onPressed,
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.black),
+            Text(text, style: const TextStyle(color: Colors.black))
+          ],
+        ),
       ),
     );
   }

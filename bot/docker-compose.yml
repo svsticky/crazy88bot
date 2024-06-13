@@ -1,0 +1,20 @@
+services:
+  database:
+    image: mariadb
+    environment:
+      - "MARIADB_ROOT_PASSWORD=123"
+      - "MARIADB_DATABASE=crazy88"
+      - "MARIADB_USER=crazy88"
+      - "MARIADB_PASSWORD=crazy88"
+
+  crazy88bot:
+    build: {}
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - "9001:9001"
+    volumes:
+      - './config.json:/opt/app/config.json'
+    environment:
+      - "CONFIG_PATH=/opt/app/config.json"

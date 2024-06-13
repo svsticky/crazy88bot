@@ -21,6 +21,7 @@ import nl.svsticky.crazy88.http.routes.submissions.GetSubmissionRoute;
 import nl.svsticky.crazy88.http.routes.submissions.GradeSubmissionRoute;
 import nl.svsticky.crazy88.http.routes.submissions.ListSubmissionsRoute;
 import nl.svsticky.crazy88.http.routes.teams.ListTeamsRoute;
+import nl.svsticky.crazy88.http.routes.teams.ScoreRoute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,7 +34,7 @@ import java.util.Arrays;
 
 public class App {
 
-    protected static final Logger logger = LogManager.getLogger();
+    protected static Logger logger;
     private static JDA jdaInstance;
 
     public static Logger getLogger() {
@@ -41,6 +42,7 @@ public class App {
     }
 
     public static void main(String[] args) {
+        logger = LogManager.getLogger(App.class);
         logger.info("Starting SVSticky Crazy88 Bot");
 
         ConfigModel config = openConfig();
@@ -59,7 +61,8 @@ public class App {
         HttpServer httpServer = new HttpServer(9001);
         httpServer.registerRoute("/favicon.ico", new FaviconRoute());
         httpServer.registerRoute("/teams/list", new ListTeamsRoute(driver));
-        httpServer.registerRoute("/submissions/list", new ListSubmissionsRoute(driver, configModel));
+        httpServer.registerRoute("/teams/score", new ScoreRoute(driver));
+        httpServer.registerRoute("/submissions/list", new ListSubmissionsRoute(driver));
         httpServer.registerRoute("/submissions", new GetSubmissionRoute(configModel, driver));
         httpServer.registerRoute("/submissions/grade", new GradeSubmissionRoute(driver));
 

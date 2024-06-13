@@ -1,7 +1,6 @@
-import 'package:crazy88_dashboard/components/SubmissionFullView.dart';
+import 'package:crazy88_dashboard/components/submission_full_view.dart';
 import 'package:crazy88_dashboard/components/card_footer.dart';
 import 'package:crazy88_dashboard/service/submissions.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class SubmissionsView extends StatefulWidget {

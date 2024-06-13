@@ -8,6 +8,22 @@ class Team {
   final int id;
 
   Team({required this.id});
+
+  Future<int?> getTotalScore() async {
+    try {
+      http.Response response = await http.get(Uri.parse("$url/teams/score?teamId=$id"));
+      if(response.statusCode == 200) {
+        Map<dynamic, dynamic> payload = jsonDecode(response.body);
+        return payload['totalScore'];
+      } else {
+        debugPrint("Failed to load total score: ${response.statusCode}");
+      }
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
+
+    return null;
+  }
 }
 
 Future<List<Team>?> listTeams() async {

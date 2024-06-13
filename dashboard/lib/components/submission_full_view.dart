@@ -1,3 +1,4 @@
+import 'package:crazy88_dashboard/components/load_or.dart';
 import 'package:crazy88_dashboard/service/submissions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -201,23 +202,3 @@ class _SubmissionFullViewState extends State<SubmissionFullView> {
   }
 }
 
-class LoaderOr extends StatelessWidget {
-  final bool loading;
-  final Widget child;
-  final double size;
-
-  const LoaderOr({super.key, required this.loading, required this.child, this.size = 40.0});
-
-  @override
-  Widget build(BuildContext context) {
-    if(loading) {
-      return SizedBox(
-        width: size,
-        height: size,
-        child: const CircularProgressIndicator(),
-      );
-    } else {
-      return child;
-    }
-  }
-}

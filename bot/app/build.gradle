@@ -1,10 +1,10 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+//    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'application'
 }
 
+sourceCompatibility = '1.21'
 version = "1.0.0"
-
 
 repositories {
     mavenCentral()
@@ -15,20 +15,30 @@ dependencies {
     implementation 'dev.array21:classvalidator:1.0.1'
 
     implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
-    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.23.1'
     implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.1'
 
-    implementation('net.dv8tion:JDA:5.0.0-beta.24')
-    implementation('mysql:mysql-connector-java:8.0.33')
+    implementation 'net.dv8tion:JDA:5.0.0-beta.24'
+    implementation 'mysql:mysql-connector-java:8.0.33'
 }
 
-sourceCompatibility = '1.21'
 
 application {
     mainClass = 'nl.svsticky.crazy88.App'
 }
 
-shadowJar {
-    archiveClassifier.set("dist")
-    archiveBaseName.set(rootProject.name)
+jar {
+    duplicatesStrategy = 'EXCLUDE'
+    manifest {
+        attributes 'Main-Class': 'nl.svsticky.crazy88.App'
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
+
+//shadowJar {
+//    archiveClassifier.set("dist")
+//    archiveBaseName.set(rootProject.name)
+//}

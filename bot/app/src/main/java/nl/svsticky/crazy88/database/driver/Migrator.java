@@ -3,13 +3,24 @@ package nl.svsticky.crazy88.database.driver;
 import nl.svsticky.crazy88.App;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,8 +39,10 @@ public class Migrator {
 
         if(this.migrationTableExists()) {
             this.migrations = this.loadExistingMigrations();
+            App.getLogger().debug("Migrations table already exists");
         } else {
             this.migrations = new ArrayList<>();
+            App.getLogger().debug("Migrations table does not exist");
         }
     }
 
@@ -39,13 +52,19 @@ public class Migrator {
      * @throws IOException IO error
      */
     public void applyMigrations() throws SQLException, IOException {
-        Stream<DiskMigration> diskMigrations = this.loadDiskMigrations();
-        List<DiskMigration> toApply = diskMigrations
+        List<DiskMigration> diskMigrations = this.loadDiskMigrations().toList();
+        App.getLogger().debug("Found {} available migrations", diskMigrations.size());
+
+        List<DiskMigration> toApply = new ArrayList<>(diskMigrations
+                .stream()
                 .filter(migration -> this.migrations
                         .stream()
                         .noneMatch(m -> m.version() == migration.version())
                 )
-                .toList();
+                .toList());
+        toApply.sort(Comparator.comparingInt(DiskMigration::version));
+
+        App.getLogger().info("Applying {} migrations", toApply.size());
 
         for (DiskMigration migration : toApply) {
             App.getLogger().info("Applying migration {}: {}", migration.version(), migration.name());
@@ -59,6 +78,7 @@ public class Migrator {
 
                 PreparedStatement p = this.driver.getConnection().prepareStatement(part);
                 p.execute();
+                p.close();
             }
 
 
@@ -69,6 +89,7 @@ public class Migrator {
             p1.setString(2, migration.name());
 
             p1.execute();
+            p1.close();
 
             this.migrations.add(new Migration(
                     migration.version(),
@@ -95,6 +116,12 @@ public class Migrator {
                             .lines()
                             .collect(Collectors.joining("\n"));
 
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
                     String[] fileNameParts = fileName
                             .split(Pattern.quote("."))[0]
                             .split(Pattern.quote("_"));
@@ -118,20 +145,43 @@ public class Migrator {
      * @return A list of files in the directory
      * @throws IOException IO error
      */
+    @SuppressWarnings("SameParameterValue")
     private List<String> getResourceFiles(String path) throws IOException {
-        List<String> filenames = new ArrayList<>();
-
-        try (
-                InputStream in = getResourceAsStream(path);
-                BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-            String resource;
-
-            while ((resource = br.readLine()) != null) {
-                filenames.add(resource);
+        try {
+            URI uri = Objects.requireNonNull(Migrator.class.getResource(path)).toURI();
+            Path fsPath;
+            FileSystem fileSystem = null;
+            if (uri.getScheme().equals("jar")) {
+                fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
+                fsPath = fileSystem.getPath(path);
+            } else {
+                fsPath = Paths.get(uri);
             }
-        }
 
-        return filenames;
+            Stream<Path> walk = Files.walk(fsPath, 1);
+
+            List<String> filenames = new ArrayList<>();
+
+            Iterator<Path> it = walk.iterator();
+            while(it.hasNext()) {
+                Path p = it.next();
+
+                if(!p.getFileName().toString().endsWith("sql")) {
+                    App.getLogger().debug("Skipping {}, not an SQL file", p);
+                    continue;
+                }
+
+                filenames.add(p.getFileName().toString());
+            }
+
+            if(fileSystem != null) {
+                fileSystem.close();
+            }
+
+            return filenames;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -139,20 +189,12 @@ public class Migrator {
      * @param resource The full path to the resource inside the JAR
      * @return The stream to the resource
      */
+    @SuppressWarnings("resource")
     private InputStream getResourceAsStream(String resource) {
-        final InputStream in
-                = getContextClassLoader().getResourceAsStream(resource);
-
+        final InputStream in = Migrator.class.getResourceAsStream(resource);
         return in == null ? getClass().getResourceAsStream(resource) : in;
     }
 
-    /**
-     * Get the context class loader
-     * @return the context class loader
-     */
-    private ClassLoader getContextClassLoader() {
-        return Thread.currentThread().getContextClassLoader();
-    }
 
     /**
      * Load migrations which have already been applied
@@ -191,7 +233,7 @@ public class Migrator {
         // so check to be sure
         while(tables.next()) {
             if(tables.getString("TABLE_NAME").equals(MIGRATION_TABLE)) {
-                tables.close();;
+                tables.close();
                 return true;
             }
         }
