@@ -95,10 +95,10 @@ public class SubmitCommand implements CommandHandler {
             List<Integer> unlockedIds = availableAssignments.stream().map(Team.AvailableAssignment::id).toList();
 
             // Check if the assignment is unlocked
-            if(!unlockedIds.contains(givenAssignmentId.get())) {
-                interactionHook.editOriginal(Replies.SUBMIT_ASSIGNMENT_NOT_UNLOCKED).queue();
-                return;
-            }
+//            if(!unlockedIds.contains(givenAssignmentId.get())) {
+//                interactionHook.editOriginal(Replies.SUBMIT_ASSIGNMENT_NOT_UNLOCKED).queue();
+//                return;
+//            }
         } catch (SQLException e) {
             App.getLogger().error(e);
             interactionHook.editOriginal(Replies.ERROR).queue();
