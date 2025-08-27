@@ -6,9 +6,11 @@ import java.util.HashMap;
 
 public class LocationModel {
     @Required
-    public String geoLong;
+    public String name;
     @Required
     public String geoLat;
+    @Required
+    public String geoLong;
     /**
      * A map of the assignments.
      * The keys must be > 0 and must be continuous

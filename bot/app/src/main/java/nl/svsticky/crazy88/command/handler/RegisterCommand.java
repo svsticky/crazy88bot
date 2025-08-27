@@ -88,13 +88,18 @@ public class RegisterCommand implements CommandHandler {
         replyCallback.replyEmbeds(new EmbedBuilder()
                 .setDescription("Je bent geregistreerd! Hier is je eerste locatie:")
                 .addField(new MessageEmbed.Field(
-                        "Long",
-                        config.locations.get(startingLocationId).geoLong,
+                        "Naam",
+                        config.locations.get(startingLocationId).name,
                         true
                 ))
                 .addField(new MessageEmbed.Field(
                         "Lat",
                         config.locations.get(startingLocationId).geoLat,
+                        true
+                ))
+                .addField(new MessageEmbed.Field(
+                        "Long",
+                        config.locations.get(startingLocationId).geoLong,
                         true
                 ))
                 .build()

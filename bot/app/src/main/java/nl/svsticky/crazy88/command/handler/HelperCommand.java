@@ -65,13 +65,18 @@ public class HelperCommand implements CommandHandler {
             replyCallback.replyEmbeds(new EmbedBuilder()
                     .setDescription("De volgende helper is ontgrendeld:")
                     .addField(new MessageEmbed.Field(
-                            "Long",
-                            nextLocation.geoLong,
+                            "Naam",
+                            nextLocation.name,
                             true
                     ))
                     .addField(new MessageEmbed.Field(
                             "Lat",
                             nextLocation.geoLat,
+                            true
+                    ))
+                    .addField(new MessageEmbed.Field(
+                            "Long",
+                            nextLocation.geoLong,
                             true
                     ))
                     .build()
