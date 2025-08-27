@@ -21,9 +21,7 @@
                 "8": "Laat de Belg in je los",
                 "9": "Full nerd mode",
                 "10": "Doe een zwaardgevecht",
-                "11": "Schrijf een gedicht met de eerste letter van de namen in je groepje",
-                "12": "Leef op het randje",
-                "13": "Teken je favoriete supermentor"
+                "11": "Schrijf een gedicht met de eerste letter van de namen in je groepje"
             }
         },
         "2": {
@@ -31,6 +29,8 @@
             "geoLat": "52.0930336",
             "geoLong": "5.1187213",
             "assignments": {
+                "12": "Leef op het randje",
+                "13": "Teken je favoriete supermentor",
                 "14": "Wees een redder in nood",
                 "15": "Maak een film trailer",
                 "16": "Blaas een bel",
@@ -39,10 +39,7 @@
                 "19": "Zoek een roeiboot (bonuspunten als je er ook in mag)",
                 "20": "Voel je eventjes een baby",
                 "21": "Eet een raketje",
-                "22": "Verkleed als een bekend persoon en ga op de foto",
-                "23": "Vervang je veters door drop",
-                "24": "Maak een selfie met iemand die lijkt op Bowser",
-                "25": "Playback je favo song"
+                "22": "Verkleed als een bekend persoon en ga op de foto"
             }
         },
         "3": {
@@ -50,6 +47,9 @@
             "geoLat": "52.0920350",
             "geoLong": "5.1146252",
             "assignments": {
+                "23": "Vervang je veters door drop",
+                "24": "Maak een selfie met iemand die lijkt op Bowser",
+                "25": "Playback je favo song",
                 "26": "Eet een citroen",
                 "27": "Breek een hart",
                 "28": "Doe de worm",
@@ -57,12 +57,7 @@
                 "30": "Lanceer je eigen kledinglijn",
                 "31": "Doe een yoga houding, hoe moeilijker hoe beter",
                 "32": "Sleutel wat met de omgeving",
-                "33": "Laat iemand schrikken van de organisatie",
-                "34": "Maak een foto met een supermentor",
-                "35": "Vind een ster",
-                "36": "Schrijf een gedicht over je mentor en draag deze voor",
-                "37": "Schrijf met zijn allen een ode aan een teamlid",
-                "38": "Vind een object in de bestuurskleur"
+                "33": "Laat iemand schrikken van de organisatie"
             }
         },
         "4": {
@@ -70,18 +65,17 @@
             "geoLat": "52.089890",
             "geoLong": "5.112112",
             "assignments": {
+                "34": "Maak een foto met een supermentor",
+                "35": "Vind een ster",
+                "36": "Schrijf een gedicht over je mentor en draag deze voor",
+                "37": "Schrijf met zijn allen een ode aan een teamlid",
+                "38": "Vind een object in de bestuurskleur",
                 "39": "Bedenk een dans met je groep",
                 "40": "Beschrijf je favoriete sport zonder de naam te zeggen",
                 "41": "Tell de hoeveelheid ‘you’ in Never Gonna Give You Up",
                 "42": "Vraag aan je supermentor wat die nodig heeft en maak er een foto van",
                 "43": "Vertel je hobby en beeld deze uit",
-                "44": "Zoek het hoogste punt in je omgeving",
-                "45": "Maak een foto met een huisdier",
-                "46": "Doe een koprol",
-                "47": "Doe een koningsdag spel",
-                "48": "Zing samen een lied voor een supermentor",
-                "49": "Doe een lay-up en scoor",
-                "50": "Eet een plakje worst"
+                "44": "Zoek het hoogste punt in je omgeving"
             }
         },
         "5": {
@@ -89,19 +83,17 @@
             "geoLat": "52.0899538",
             "geoLong": "5.1171163",
             "assignments": {
+                "45": "Maak een foto met een huisdier",
+                "46": "Doe een koprol",
+                "47": "Doe een koningsdag spel",
+                "48": "Zing samen een lied voor een supermentor",
+                "49": "Doe een lay-up en scoor",
+                "50": "Eet een plakje worst",
                 "51": "Maak jezelf wat lekkers te drinken",
                 "52": "Maak een foto waarbij je een van je mentoren water geeft",
                 "53": "Kaas is lekker, eet een lekker stukje kaas",
                 "54": "Vouw een zwaan",
-                "55": "Vind het kasteel van Bowser",
-                "56": "Zoek het grootste oranje voorwerp dat je kan vinden",
-                "57": "Geef een voorwerp door, zoals bij rugby",
-                "58": "What do you meme? Maak een foto of filmpje van je beste meme",
-                "59": "Praat met een bestuurder",
-                "60": "Maak een foto van een zwaard",
-                "61": "Verzin een bijnaam voor je groep",
-                "62": "Fotografeer een insect",
-                "63": "Bouw een piramide"
+                "55": "Vind het kasteel van Bowser"
             }
         },
         "6": {
@@ -109,9 +101,24 @@
             "geoLat": "52.0908039",
             "geoLong": "5.1218397",
             "assignments": {
+                "56": "Zoek het grootste oranje voorwerp dat je kan vinden",
+                "57": "Geef een voorwerp door, zoals bij rugby",
+                "58": "What do you meme? Maak een foto of filmpje van je beste meme",
+                "59": "Praat met een bestuurder",
+                "60": "Maak een foto van een zwaard",
+                "61": "Verzin een bijnaam voor je groep",
+                "62": "Fotografeer een insect",
+                "63": "Bouw een piramide",
                 "64": "Kijk een gegeven paard in de bek",
                 "65": "Lak je nagels je teamkleur",
-                "66": "Ga hamsteren",
+                "66": "Ga hamsteren"
+            }
+        },
+        "7": {
+            "name": "Lucasbolwerk",
+            "geoLat": "52.0940392",
+            "geoLong": "5.1264846",
+            "assignments": {
                 "67": "Maak een groepslogo",
                 "68": "Maak een panoramafoto waar je minstens 3 keer zelf op staat",
                 "69": "Praat als Donald Duck",
@@ -121,14 +128,7 @@
                 "73": "Verdedig het doel",
                 "74": "Speel boter kaas en eieren",
                 "75": "Bedenk een alternatief voor een kroon",
-                "76": "Beeld de olympische ringen uit"
-            }
-        },
-        "7": {
-            "name": "Lucasbolwerk",
-            "geoLat": "52.0940392",
-            "geoLong": "5.1264846",
-            "assignments": {
+                "76": "Beeld de olympische ringen uit",
                 "77": "Maak een foto met het instrument wat je bespeelt",
                 "78": "Steek het vuur aan",
                 "79": "Maak een foto van een U.F.O",
@@ -155,7 +155,7 @@
         "port": 3306
     },
     "submit": {
-        "submissionsDirectory": "/submissions"
+        "submissionDirectory": "/submissions"
     },
     "teamStartingLocations": {
     "1": "4",
