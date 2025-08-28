@@ -1,5 +1,6 @@
 CREATE TABLE teams (
-    team_id INT NOT NULL
+    team_id INT NOT NULL,
+    helper_location INT NOT NULL
 );
 
 CREATE TABLE team_available_locations (

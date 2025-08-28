@@ -8,6 +8,7 @@ import nl.svsticky.crazy88.command.CommandData;
 import nl.svsticky.crazy88.command.CommandHandler;
 import nl.svsticky.crazy88.command.CommandName;
 import nl.svsticky.crazy88.command.CommandOption;
+import nl.svsticky.crazy88.App;
 import nl.svsticky.crazy88.command.Replies;
 import nl.svsticky.crazy88.config.model.ConfigModel;
 import nl.svsticky.crazy88.config.model.LocationModel;
@@ -56,8 +57,9 @@ public class HelperCommand implements CommandHandler {
                 return;
             }
 
-            int max = Collections.max(alreadyUnlockedIds);
-            int next = max == config.locations.size() ? 0 : max + 1;
+            // int max = Collections.max(alreadyUnlockedIds);
+            // int next = max == config.locations.size() ? 1 : max + 1;
+            int next = team.getNextHelperLocation();
 
             team.unlockLocation(next);
             LocationModel nextLocation = config.locations.get(next);
@@ -82,6 +84,8 @@ public class HelperCommand implements CommandHandler {
                     .build()
             ).queue();
         } catch (SQLException e) {
+            App.getLogger().error(e);
+
             replyCallback.reply(Replies.ERROR).queue();
         }
     }

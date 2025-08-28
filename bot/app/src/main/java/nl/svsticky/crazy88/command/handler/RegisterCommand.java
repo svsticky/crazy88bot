@@ -65,13 +65,14 @@ public class RegisterCommand implements CommandHandler {
             Optional<Team> mTeam = Team.getbyId(this.driver, teamId);
             Team team;
             if(mTeam.isEmpty()) {
-                team  = Team.create(this.driver, teamId);
+                team  = Team.create(this.driver, teamId, startingLocationId);
             } else {
                 team = mTeam.get();
             }
 
             // Unlock the first location
             team.unlockLocation(startingLocationId);
+            team.helperLocation = startingLocationId;
 
             // Make sure the user exists and is in the team
             if(mUser.isEmpty()) {

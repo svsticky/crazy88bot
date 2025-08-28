@@ -17,23 +17,27 @@ public class Team {
 
     public final int teamId;
 
+    public int helperLocation;
+
     public record AvailableLocation(int id) {}
     public record AvailableAssignment(int id, int locationId, String assignment) {}
     public record SubmittedAssignment(int id, Optional<Integer> assignedGrade) {}
 
-    private Team(Driver driver, int teamId) {
+    private Team(Driver driver, int teamId, int helperLocation) {
         this.driver = driver;
         this.teamId = teamId;
+        this.helperLocation = helperLocation;
     }
 
-    public static Team create(Driver driver, int teamId) throws SQLException {
-        PreparedStatement pr = driver.getConnection().prepareStatement("INSERT INTO teams (team_id) VALUES (?)");
+    public static Team create(Driver driver, int teamId, int startingLocationId) throws SQLException {
+        PreparedStatement pr = driver.getConnection().prepareStatement("INSERT INTO teams (team_id, helper_location) VALUES (?, ?)");
         pr.setInt(1, teamId);
+        pr.setInt(2, startingLocationId);
 
         pr.execute();
         pr.close();
 
-        return new Team(driver, teamId);
+        return new Team(driver, teamId, startingLocationId);
     }
 
     public static Optional<Team> getbyId(Driver driver, int teamId) throws SQLException {
@@ -43,8 +47,10 @@ public class Team {
         ResultSet rs = pr.executeQuery();
         if(!rs.next()) return Optional.empty();
 
+        int helperLocation = rs.getInt("helper_location");
+
         pr.close();
-        return Optional.of(new Team(driver, teamId));
+        return Optional.of(new Team(driver, teamId, helperLocation));
     }
 
     public static List<Team> getTeams(Driver driver) throws SQLException {
@@ -52,7 +58,7 @@ public class Team {
         ResultSet rs = pr.executeQuery();
         List<Team> teams = new ArrayList<>();
         while(rs.next()) {
-            teams.add(new Team(driver, rs.getInt("team_id")));
+            teams.add(new Team(driver, rs.getInt("team_id"), rs.getInt("helper_location")));
         }
 
         pr.close();
@@ -188,5 +194,21 @@ public class Team {
 
         pr.execute();
         pr.close();
+    }
+
+    public int getNextHelperLocation() throws SQLException{
+        
+        helperLocation++;
+        if (helperLocation == 8)
+            helperLocation = 1;
+        
+        PreparedStatement pr = driver.getConnection().prepareStatement("UPDATE teams SET helper_location = ? WHERE team_id = ?");
+        pr.setInt(1, helperLocation);
+        pr.setInt(2, teamId);
+
+        pr.execute();
+        pr.close();
+
+        return helperLocation;
     }
 }
